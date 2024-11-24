@@ -7,41 +7,47 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: black;
-            color: #00ff00;
+            background-color: #1a1a1a; /* Fundo escuro, mas não totalmente preto */
+            color: #b3ffcc; /* Verde claro suave */
             text-align: center;
         }
         .container {
-            border: 2px solid #00ff00;
+            border: 2px solid #66ffcc; /* Verde suave */
             padding: 20px;
             margin: 20px auto;
             width: 80%;
             border-radius: 10px;
-            box-shadow: 0 0 10px #00ff00;
+            box-shadow: 0 0 20px #66ffcc;
         }
         select, input, button {
-            background-color: black;
-            color: #00ff00;
-            border: 1px solid #00ff00;
+            background-color: #262626; /* Fundo cinza escuro */
+            color: #b3ffcc; /* Texto em verde claro */
+            border: 1px solid #66ffcc; /* Bordas suaves */
             border-radius: 5px;
             padding: 10px;
             margin: 5px;
         }
         button {
             cursor: pointer;
+            transition: background-color 0.3s, color 0.3s; /* Efeito de transição */
+        }
+        button:hover {
+            background-color: #66ffcc; /* Fundo verde suave no hover */
+            color: #1a1a1a; /* Texto escuro no hover */
         }
         .server-card {
-            border: 2px solid #00ff00;
+            border: 2px solid #66ffcc;
             margin: 10px;
             padding: 15px;
             border-radius: 10px;
-            box-shadow: 0 0 10px #00ff00;
+            box-shadow: 0 0 20px #66ffcc;
+            background-color: #262626; /* Fundo cinza escuro */
         }
         .online {
-            color: lime;
+            color: #66ff99; /* Verde mais vivo para servidores online */
         }
         .offline {
-            color: red;
+            color: #ff6666; /* Vermelho suave para servidores offline */
         }
     </style>
 </head>
@@ -54,41 +60,11 @@
         <input type="number" id="port" placeholder="Porta">
         <label>Tipo de Jogo:</label>
         <select id="gameType">
-            <option value="7d2d">7 Days to Die</option>
-            <option value="arkse">ARK: Survival Evolved</option>
-            <option value="arma2">Arma 2</option>
-            <option value="arma3">Arma 3</option>
-            <option value="assetto">Assetto Corsa</option>
-            <option value="bf1942">Battlefield 1942</option>
-            <option value="bf2">Battlefield 2</option>
-            <option value="bf2142">Battlefield 2142</option>
-            <option value="bf3">Battlefield 3</option>
-            <option value="cod">Call of Duty</option>
-            <option value="cod2">Call of Duty 2</option>
-            <option value="cod4">Call of Duty 4</option>
-            <option value="codmw3">Call of Duty: Modern Warfare 3</option>
-            <option value="cs16">Counter-Strike 1.6</option>
-            <option value="csgo">Counter-Strike: Global Offensive</option>
-            <option value="css">Counter-Strike: Source</option>
-            <option value="dod">Day of Defeat</option>
-            <option value="dods">Day of Defeat: Source</option>
-            <option value="dayz">DayZ</option>
-            <option value="dontstarve">Don't Starve Together</option>
-            <option value="garrysmod">Garry's Mod</option>
-            <option value="hl">Half-Life</option>
-            <option value="hl2dm">Half-Life 2 Deathmatch</option>
-            <option value="insurgency">Insurgency</option>
             <option value="minecraft">Minecraft</option>
-            <option value="quake3">Quake 3 Arena</option>
-            <option value="rust">Rust</option>
-            <option value="squad">Squad</option>
-            <option value="tf2">Team Fortress 2</option>
-            <option value="terraria">Terraria</option>
-            <option value="theship">The Ship</option>
-            <option value="ut2004">Unreal Tournament 2004</option>
-            <option value="unturned">Unturned</option>
+            <option value="csgo">CS:GO</option>
             <option value="valheim">Valheim</option>
-        </select>        
+            <!-- Adicione mais jogos aqui -->
+        </select>
         <button id="addServer">Adicionar Servidor</button>
     </div>
     <h2>Lista de Servidores</h2>
@@ -96,68 +72,80 @@
     <h2>Tempo para próxima atualização: <span id="timer">60</span> segundos</h2>
     <script>
         const serverList = document.getElementById('serverList');
-        const timerElement = document.getElementById('timer');
+const timerElement = document.getElementById('timer');
 
-        // Função para carregar os servidores
-        const fetchServers = async () => {
-            const response = await fetch('/servers');
-            const data = await response.json();
+// Função para carregar os servidores
+const fetchServers = async () => {
+    const response = await fetch('/servers');
+    const data = await response.json();
 
-            serverList.innerHTML = ''; // Limpa a lista de servidores
-            data.servers.forEach(server => {
-                const serverCard = document.createElement('div');
-                serverCard.classList.add('server-card');
-                serverCard.innerHTML = `
-                    <p><strong>Nome:</strong> ${server.name || 'N/A'}</p>
-                    <p><strong>IP:</strong> ${server.ip}</p>
-                    <p><strong>Porta:</strong> ${server.port}</p>
-                    <p><strong>Status:</strong> <span class="${server.online ? 'online' : 'offline'}">
-                        ${server.online ? 'Online' : 'Offline'}
-                    </span></p>
-                    <p><strong>Jogadores:</strong> ${server.players} / ${server.maxPlayers}</p>
-                    <p><strong>Jogadores Online:</strong> ${server.playerNames || 'Nenhum'}</p>
-                    <p><strong>Ping:</strong> ${server.ping || 'N/A'} ms</p>
-                `;
-                serverList.appendChild(serverCard);
-            });
-        };
+    serverList.innerHTML = ''; // Limpa a lista de servidores
+    data.servers.forEach(server => {
+        const serverCard = document.createElement('div');
+        serverCard.classList.add('server-card');
+        serverCard.innerHTML = `
+            <p><strong>Nome:</strong> ${server.name || 'N/A'}</p>
+            <p><strong>IP:</strong> ${server.ip}</p>
+            <p><strong>Porta:</strong> ${server.port}</p>
+            <p><strong>Status:</strong> <span class="${server.online ? 'online' : 'offline'}">
+                ${server.online ? 'Online' : 'Offline'}
+            </span></p>
+            <p><strong>Jogadores:</strong> ${server.players} / ${server.maxPlayers}</p>
+            <p><strong>Jogadores Online:</strong> ${server.playerNames || 'Nenhum'}</p>
+            <p><strong>Ping:</strong> ${server.ping || 'N/A'} ms</p>
+        `;
+        serverList.appendChild(serverCard);
+    });
+};
 
-        // Função para adicionar um servidor
-        document.getElementById('addServer').addEventListener('click', async () => {
-            const ip = document.getElementById('ip').value;
-            const port = document.getElementById('port').value;
-            const gameType = document.getElementById('gameType').value;
+// Função para adicionar um servidor com verificação de usuário e senha
+document.getElementById('addServer').addEventListener('click', async () => {
+    // Solicitar usuário e senha
+    const username = prompt('Digite o usuário:');
+    const password = prompt('Digite a senha:');
 
-            if (!ip || !port || !gameType) {
-                alert('Por favor, preencha todos os campos!');
-                return;
-            }
+    // Verifique se as credenciais são válidas
+    if (username !== 'admin' || password !== '1234') {
+        alert('Usuário ou senha inválidos!');
+        return;
+    }
 
-            await fetch('/add-server', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ip, port, gameType })
-            });
+    // Se as credenciais forem válidas, continua o processo de adição
+    const ip = document.getElementById('ip').value;
+    const port = document.getElementById('port').value;
+    const gameType = document.getElementById('gameType').value;
 
-            // Atualiza a lista imediatamente após adicionar
-            fetchServers();
-        });
+    if (!ip || !port || !gameType) {
+        alert('Por favor, preencha todos os campos!');
+        return;
+    }
 
-        // Função para atualizar o tempo restante
-        async function updateRemainingTime() {
-            const response = await fetch('/remaining-time');
-            const data = await response.json();
-            timerElement.innerText = data.remainingTime;  // Atualiza o timer na página
+    await fetch('/add-server', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ip, port, gameType })
+    });
 
-            // Após cada atualização do tempo, recarrega os servidores
-            fetchServers();
-        }
+    // Atualiza a lista imediatamente após adicionar
+    fetchServers();
+});
 
-        // Atualiza o tempo e a lista de servidores a cada 60 segundos
-        setInterval(updateRemainingTime, 1000);
+// Função para atualizar o tempo restante
+async function updateRemainingTime() {
+    const response = await fetch('/remaining-time');
+    const data = await response.json();
+    timerElement.innerText = data.remainingTime;  // Atualiza o timer na página
 
-        // Carrega os servidores ao carregar a página
-        fetchServers();
+    // Após cada atualização do tempo, recarrega os servidores
+    fetchServers();
+}
+
+// Atualiza o tempo e a lista de servidores a cada 60 segundos
+setInterval(updateRemainingTime, 1000);
+
+// Carrega os servidores ao carregar a página
+fetchServers();
+
     </script>
 </body>
 </html>
