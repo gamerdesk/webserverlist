@@ -70,82 +70,106 @@
     <h2>Lista de Servidores</h2>
     <div id="serverList" class="container"></div>
     <h2>Tempo para próxima atualização: <span id="timer">60</span> segundos</h2>
+
     <script>
         const serverList = document.getElementById('serverList');
-const timerElement = document.getElementById('timer');
+        const timerElement = document.getElementById('timer');
 
-// Função para carregar os servidores
-const fetchServers = async () => {
-    const response = await fetch('/servers');
-    const data = await response.json();
+        // Função para carregar as credenciais de usuários
+        async function carregarCredenciais() {
+            try {
+                // Faz o fetch do arquivo JSON
+                const response = await fetch('./users.json');
+                if (!response.ok) {
+                    throw new Error('Erro ao carregar o JSON');
+                }
 
-    serverList.innerHTML = ''; // Limpa a lista de servidores
-    data.servers.forEach(server => {
-        const serverCard = document.createElement('div');
-        serverCard.classList.add('server-card');
-        serverCard.innerHTML = `
-            <p><strong>Nome:</strong> ${server.name || 'N/A'}</p>
-            <p><strong>IP:</strong> ${server.ip}</p>
-            <p><strong>Porta:</strong> ${server.port}</p>
-            <p><strong>Status:</strong> <span class="${server.online ? 'online' : 'offline'}">
-                ${server.online ? 'Online' : 'Offline'}
-            </span></p>
-            <p><strong>Jogadores:</strong> ${server.players} / ${server.maxPlayers}</p>
-            <p><strong>Jogadores Online:</strong> ${server.playerNames || 'Nenhum'}</p>
-            <p><strong>Ping:</strong> ${server.ping || 'N/A'} ms</p>
-        `;
-        serverList.appendChild(serverCard);
-    });
-};
+                // Converte o JSON em objeto JavaScript
+                const users = await response.json();
+                return users;
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro ao carregar as credenciais.');
+                return [];
+            }
+        }
 
-// Função para adicionar um servidor com verificação de usuário e senha
-document.getElementById('addServer').addEventListener('click', async () => {
-    // Solicitar usuário e senha
-    const username = prompt('Digite o usuário:');
-    const password = prompt('Digite a senha:');
+        // Função para carregar os servidores
+        const fetchServers = async () => {
+            const response = await fetch('/servers');
+            const data = await response.json();
 
-    // Verifique se as credenciais são válidas
-    if (username !== 'admin' || password !== '1234') {
-        alert('Usuário ou senha inválidos!');
-        return;
-    }
+            serverList.innerHTML = ''; // Limpa a lista de servidores
+            data.servers.forEach(server => {
+                const serverCard = document.createElement('div');
+                serverCard.classList.add('server-card');
+                serverCard.innerHTML = `
+                    <p><strong>Nome:</strong> ${server.name || 'N/A'}</p>
+                    <p><strong>IP:</strong> ${server.ip}</p>
+                    <p><strong>Porta:</strong> ${server.port}</p>
+                    <p><strong>Status:</strong> <span class="${server.online ? 'online' : 'offline'}">
+                        ${server.online ? 'Online' : 'Offline'}
+                    </span></p>
+                    <p><strong>Jogadores:</strong> ${server.players} / ${server.maxPlayers}</p>
+                    <p><strong>Jogadores Online:</strong> ${server.playerNames || 'Nenhum'}</p>
+                    <p><strong>Ping:</strong> ${server.ping || 'N/A'} ms</p>
+                `;
+                serverList.appendChild(serverCard);
+            });
+        };
 
-    // Se as credenciais forem válidas, continua o processo de adição
-    const ip = document.getElementById('ip').value;
-    const port = document.getElementById('port').value;
-    const gameType = document.getElementById('gameType').value;
+        // Função para adicionar um servidor com verificação de usuário e senha
+        document.getElementById('addServer').addEventListener('click', async () => {
+            // Solicitar usuário e senha
+            const username = prompt('Digite o usuário:');
+            const password = prompt('Digite a senha:');
 
-    if (!ip || !port || !gameType) {
-        alert('Por favor, preencha todos os campos!');
-        return;
-    }
+            // Carregar as credenciais do JSON
+            const users = await carregarCredenciais();
 
-    await fetch('/add-server', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ip, port, gameType })
-    });
+            // Verificar se o usuário e senha estão corretos
+            const user = users.find(u => u.username === username && u.password === password);
 
-    // Atualiza a lista imediatamente após adicionar
-    fetchServers();
-});
+            if (!user) {
+                alert('Usuário ou senha inválidos!');
+                return;
+            }
 
-// Função para atualizar o tempo restante
-async function updateRemainingTime() {
-    const response = await fetch('/remaining-time');
-    const data = await response.json();
-    timerElement.innerText = data.remainingTime;  // Atualiza o timer na página
+            // Se as credenciais forem válidas, continua o processo de adição
+            const ip = document.getElementById('ip').value;
+            const port = document.getElementById('port').value;
+            const gameType = document.getElementById('gameType').value;
 
-    // Após cada atualização do tempo, recarrega os servidores
-    fetchServers();
-}
+            if (!ip || !port || !gameType) {
+                alert('Por favor, preencha todos os campos!');
+                return;
+            }
 
-// Atualiza o tempo e a lista de servidores a cada 60 segundos
-setInterval(updateRemainingTime, 1000);
+            await fetch('/add-server', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ip, port, gameType })
+            });
 
-// Carrega os servidores ao carregar a página
-fetchServers();
+            // Atualiza a lista imediatamente após adicionar
+            fetchServers();
+        });
 
+        // Função para atualizar o tempo restante
+        async function updateRemainingTime() {
+            const response = await fetch('/remaining-time');
+            const data = await response.json();
+            timerElement.innerText = data.remainingTime;  // Atualiza o timer na página
+
+            // Após cada atualização do tempo, recarrega os servidores
+            fetchServers();
+        }
+
+        // Atualiza o tempo e a lista de servidores a cada 60 segundos
+        setInterval(updateRemainingTime, 1000);
+
+        // Carrega os servidores ao carregar a página
+        fetchServers();
     </script>
 </body>
 </html>
