@@ -1,0 +1,17 @@
+{
+  "servers": [
+    {
+      "name": "A Minecraft Server",
+      "ip": "kirkland.gamerdesk.xyz",
+      "port": 25571,
+      "type": "minecraft",
+      "map": "",
+      "players": 0,
+      "maxPlayers": 100,
+      "playerNames": "",
+      "online": true,
+      "ping": 24
+    }
+  ],
+  "lastUpdated": 1733715425442
+}
