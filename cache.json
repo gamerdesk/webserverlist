@@ -1,7 +1,7 @@
 {
   "servers": [
     {
-      "name": "GamerDesk Server",
+      "name": "A Minecraft Server",
       "ip": "kirkland.gamerdesk.xyz",
       "port": 25571,
       "type": "minecraft",
@@ -13,5 +13,5 @@
       "ping": 25
     }
   ],
-  "lastUpdated": 1732582041664
+  "lastUpdated": 1733715365435
 }

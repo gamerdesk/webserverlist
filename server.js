@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const dig = require('./dig');
+const { sendToDiscord } = require('./discordWebhook');
 
 const app = express();
 const port = 3000;
@@ -53,17 +54,24 @@ async function updateCache() {
 
     saveCache();
     console.log("Cache atualizado:", cache);
+
+    // Envia notificação para o Discord para todos os servidores com webhook
+    for (const server of servers) {
+        if (server.webhook) {
+            await sendToDiscord(server.webhook, statuses.find(s => s.ip === server.ip && s.port === server.port));
+        }
+    }
 }
 
 // Atualiza o cache a cada minuto
 setInterval(updateCache, 60 * 1000);
 
 // Rota para adicionar um servidor
-app.post('/add-server', (req, res) => {
-    const { ip, port, gameType } = req.body;
+app.post('/add-server', async (req, res) => {
+    const { ip, port, gameType, webhook } = req.body;
 
     const servers = loadServers();
-    const newServer = dig.addServer(ip, port, gameType);
+    const newServer = dig.addServer(ip, port, gameType, webhook);
     servers.push(newServer);
 
     saveServers(servers);

@@ -7,8 +7,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #1a1a1a; /* Fundo escuro, mas não totalmente preto */
-            color: #b3ffcc; /* Verde claro suave */
+            background-color: #1a1a1a; /* Fundo escuro */
+            color: #b3ffcc; /* Verde claro */
             text-align: center;
         }
         .container {
@@ -21,18 +21,18 @@
         }
         select, input, button {
             background-color: #262626; /* Fundo cinza escuro */
-            color: #b3ffcc; /* Texto em verde claro */
-            border: 1px solid #66ffcc; /* Bordas suaves */
+            color: #b3ffcc; /* Texto verde claro */
+            border: 1px solid #66ffcc; /* Bordas verdes */
             border-radius: 5px;
             padding: 10px;
             margin: 5px;
         }
         button {
             cursor: pointer;
-            transition: background-color 0.3s, color 0.3s; /* Efeito de transição */
+            transition: background-color 0.3s, color 0.3s;
         }
         button:hover {
-            background-color: #66ffcc; /* Fundo verde suave no hover */
+            background-color: #66ffcc; /* Fundo verde no hover */
             color: #1a1a1a; /* Texto escuro no hover */
         }
         .server-card {
@@ -41,13 +41,13 @@
             padding: 15px;
             border-radius: 10px;
             box-shadow: 0 0 20px #66ffcc;
-            background-color: #262626; /* Fundo cinza escuro */
+            background-color: #262626;
         }
         .online {
-            color: #66ff99; /* Verde mais vivo para servidores online */
+            color: #0ff308; /* Verde vivo */
         }
         .offline {
-            color: #ff6666; /* Vermelho suave para servidores offline */
+            color: #fc0606; /* Vermelho */
         }
     </style>
 </head>
@@ -63,8 +63,9 @@
             <option value="minecraft">Minecraft</option>
             <option value="csgo">CS:GO</option>
             <option value="valheim">Valheim</option>
-            <!-- Adicione mais jogos aqui -->
         </select>
+        <label>Webhook do Discord:</label>
+        <input type="url" id="webhook" placeholder="URL do webhook Discord">
         <button id="addServer">Adicionar Servidor</button>
     </div>
     <h2>Lista de Servidores</h2>
@@ -75,16 +76,12 @@
         const serverList = document.getElementById('serverList');
         const timerElement = document.getElementById('timer');
 
-        // Função para carregar as credenciais de usuários
         async function carregarCredenciais() {
             try {
-                // Faz o fetch do arquivo JSON
                 const response = await fetch('./users.json');
                 if (!response.ok) {
                     throw new Error('Erro ao carregar o JSON');
                 }
-
-                // Converte o JSON em objeto JavaScript
                 const users = await response.json();
                 return users;
             } catch (error) {
@@ -94,12 +91,10 @@
             }
         }
 
-        // Função para carregar os servidores
         const fetchServers = async () => {
             const response = await fetch('/servers');
             const data = await response.json();
-
-            serverList.innerHTML = ''; // Limpa a lista de servidores
+            serverList.innerHTML = '';
             data.servers.forEach(server => {
                 const serverCard = document.createElement('div');
                 serverCard.classList.add('server-card');
@@ -118,16 +113,10 @@
             });
         };
 
-        // Função para adicionar um servidor com verificação de usuário e senha
         document.getElementById('addServer').addEventListener('click', async () => {
-            // Solicitar usuário e senha
             const username = prompt('Digite o usuário:');
             const password = prompt('Digite a senha:');
-
-            // Carregar as credenciais do JSON
             const users = await carregarCredenciais();
-
-            // Verificar se o usuário e senha estão corretos
             const user = users.find(u => u.username === username && u.password === password);
 
             if (!user) {
@@ -135,10 +124,10 @@
                 return;
             }
 
-            // Se as credenciais forem válidas, continua o processo de adição
             const ip = document.getElementById('ip').value;
             const port = document.getElementById('port').value;
             const gameType = document.getElementById('gameType').value;
+            const webhook = document.getElementById('webhook').value;
 
             if (!ip || !port || !gameType) {
                 alert('Por favor, preencha todos os campos!');
@@ -148,27 +137,20 @@
             await fetch('/add-server', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ip, port, gameType })
+                body: JSON.stringify({ ip, port, gameType, webhook })
             });
 
-            // Atualiza a lista imediatamente após adicionar
             fetchServers();
         });
 
-        // Função para atualizar o tempo restante
         async function updateRemainingTime() {
             const response = await fetch('/remaining-time');
             const data = await response.json();
-            timerElement.innerText = data.remainingTime;  // Atualiza o timer na página
-
-            // Após cada atualização do tempo, recarrega os servidores
+            timerElement.innerText = data.remainingTime;
             fetchServers();
         }
 
-        // Atualiza o tempo e a lista de servidores a cada 60 segundos
         setInterval(updateRemainingTime, 1000);
-
-        // Carrega os servidores ao carregar a página
         fetchServers();
     </script>
 </body>
