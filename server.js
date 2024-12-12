@@ -63,8 +63,8 @@ async function updateCache() {
     }
 }
 
-// Atualiza o cache a cada minuto
-setInterval(updateCache, 90 * 1000);
+// Atualiza o cache a cada 120 segundos (ALTERE AQUI PARA DEFINIR O INTERVALO)
+setInterval(updateCache, 120 * 1000); // Altere o valor 120 para qualquer número de segundos desejado
 
 // Rota para adicionar um servidor
 app.post('/add-server', async (req, res) => {
@@ -95,7 +95,7 @@ app.get('/', (req, res) => {
 app.get('/remaining-time', (req, res) => {
     const currentTime = Date.now();
     const elapsedTime = currentTime - cache.lastUpdated;
-    const remainingTime = Math.max(90 - Math.floor(elapsedTime / 1000), 0);
+    const remainingTime = Math.max(120 - Math.floor(elapsedTime / 1000), 0);  // Altere 120 para o tempo desejado em segundos
     res.json({ remainingTime });
 });
 

@@ -70,7 +70,7 @@
     </div>
     <h2>Lista de Servidores</h2>
     <div id="serverList" class="container"></div>
-    <h2>Tempo para próxima atualização: <span id="timer">90</span> segundos</h2>
+    <h2>Tempo para próxima atualização: <span id="timer">120</span> segundos</h2>
 
     <script>
         const serverList = document.getElementById('serverList');
@@ -146,11 +146,12 @@
         async function updateRemainingTime() {
             const response = await fetch('/remaining-time');
             const data = await response.json();
-            timerElement.innerText = data.remainingTime;
-            fetchServers();
+            timerElement.innerText = data.remainingTime; // Atualiza o tempo exibido
+            fetchServers(); // Atualiza os servidores após o tempo passar
         }
 
-        setInterval(updateRemainingTime, 1000);
+        setInterval(updateRemainingTime, 1000); // Altere o valor aqui para um intervalo diferente se desejar (1000ms = 1 segundo)
+
         fetchServers();
     </script>
 </body>
